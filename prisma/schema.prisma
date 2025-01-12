@@ -20,6 +20,7 @@ model user {
   email_verified_at DateTime?       @db.Timestamp()
   nim               Int?            @db.Integer
   nip               Int?            @db.Integer
+  password          String          @db.VarChar()
   created_at        DateTime        @default(now())
   updated_at        DateTime        @updatedAt
   user_prodi        user_prodi?

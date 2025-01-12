@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id                Int             @id @default(autoincrement())
+  name              String          @db.VarChar()
+  email             String          @unique @db.VarChar()
+  email_verified_at DateTime?       @db.Timestamp()
+  nim               Int?            @db.Integer
+  nip               Int?            @db.Integer
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @updatedAt
+  user_prodi        user_prodi?
+  user_role         user_role?
+  user_plp          user_plp[]
+  oversees_students oversees[]      @relation("user_oversees_students")
+  oversees_dpls     oversees[]      @relation("user_oversees_dpls")
+  guidance_student  user_guidance[] @relation("user_guidance_student")
+  guidance_dpls     user_guidance[] @relation("user_guidance_dpl")
+}
+
+model prodi {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar()
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  user_prodi user_prodi[]
+}
+
+model role {
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar()
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  user_role  user_role[]
+}
+
+model plp {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar()
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  user_plp   user_plp?
+}
+
+model school {
+  id         Int        @id @default(autoincrement())
+  name       String     @db.VarChar()
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  user_plp   user_plp[]
+}
+
+model oversees {
+  id              Int      @id @default(autoincrement())
+  user_id_student Int      @db.Integer
+  user_id_dpl     Int      @db.Integer
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  user_oversees_students user @relation("user_oversees_students", fields: [user_id_student], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user_oversees_dpls     user @relation("user_oversees_dpls", fields: [user_id_dpl], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model guidance {
+  id             Int      @id @default(autoincrement())
+  note           String   @db.VarChar()
+  guidance_stage String   @db.VarChar()
+  link           String   @db.VarChar()
+  lecture_note   String   @db.VarChar()
+  confirm        Boolean  @db.Boolean
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+model user_guidance {
+  id              Int      @id @default(autoincrement())
+  guidance_id     Int
+  user_id_student Int
+  user_id_dpl     Int
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  user_guidance_student user @relation("user_guidance_student", fields: [user_id_student], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user_guidance_dpl     user @relation("user_guidance_dpl", fields: [user_id_dpl], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model user_prodi {
+  id         Int      @id @default(autoincrement())
+  user_id    Int      @unique @db.Integer
+  prodi_id   Int      @db.Integer
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  prodi prodi @relation(fields: [prodi_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user  user  @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model user_role {
+  id         Int      @id @default(autoincrement())
+  user_id    Int      @unique @db.Integer
+  role_id    Int      @db.Integer
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user user @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  role role @relation(fields: [role_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model user_plp {
+  id         Int      @id @default(autoincrement())
+  user_id    Int      @db.Integer
+  plp_id     Int      @unique @db.Integer
+  school_id  Int      @db.Integer
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user   user   @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  plp    plp    @relation(fields: [plp_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  school school @relation(fields: [school_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}

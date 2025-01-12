@@ -25,6 +25,16 @@ export class RegisterService {
       throw new ErrorResponse(404, "email already exist");
     }
 
+    const isNimExist = await prisma.user.findUnique({
+      where: {
+        nim: requestBody.nim,
+      },
+    });
+
+    if (isNimExist) {
+      throw new ErrorResponse(404, "nim already exist");
+    }
+
     const hashedPassword = await Bun.password.hash(requestBody.password);
     const [storedUser] = await prisma.$transaction([
       prisma.user.create({

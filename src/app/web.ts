@@ -1,6 +1,7 @@
 import cors, { type CorsOptions } from "cors";
 import express from "express";
 import { errorMiddleware } from "../middleware/error-middleware";
+import { publicRoute } from "../router/public-route";
 
 const web = express();
 
@@ -22,5 +23,6 @@ const corsOptions: CorsOptions = {
 
 web.use(cors(corsOptions));
 web.use(express.json());
+web.use(publicRoute);
 web.use(errorMiddleware);
 export { web };

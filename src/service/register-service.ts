@@ -1,7 +1,10 @@
 import { prisma } from "../app/database";
 import { ErrorResponse } from "../error/error-response";
 import {
+  toRegisterDplUserResponse,
   toRegisterStudentUserResponse,
+  type RegisterDplRequest,
+  type RegisterDplResponse,
   type RegisterStudentRequest,
   type RegisterStudentResponse,
 } from "../model/register-model";
@@ -13,7 +16,7 @@ export class RegisterService {
     request: RegisterStudentRequest
   ): Promise<RegisterStudentResponse> {
     const requestBody: RegisterStudentRequest = Validation.validate(
-      RegisterValidation.registerSchema,
+      RegisterValidation.registerUserStudentSchema,
       request
     );
 
@@ -65,5 +68,63 @@ export class RegisterService {
     ]);
 
     return toRegisterStudentUserResponse(storedUserStudent);
+  }
+
+  static async storeUserDpl(
+    request: RegisterDplRequest
+  ): Promise<RegisterDplResponse> {
+    const requestBody: RegisterDplRequest = Validation.validate(
+      RegisterValidation.registerUserDplSchema,
+      request
+    );
+
+    const isEmailExist = await prisma.user.findUnique({
+      where: {
+        email: requestBody.email,
+      },
+    });
+
+    if (isEmailExist) {
+      throw new ErrorResponse(404, "email already exist");
+    }
+
+    const isNipExist = await prisma.user.findUnique({
+      where: {
+        nip: requestBody.nip,
+      },
+    });
+
+    if (isNipExist) {
+      throw new ErrorResponse(404, "nip already exist");
+    }
+
+    const hashedPassword = await Bun.password.hash(requestBody.password);
+    const role = await prisma.role.findUnique({
+      where: {
+        name: "dpl",
+      },
+    });
+
+    if (!role) {
+      throw new ErrorResponse(404, "role not found");
+    }
+
+    const [storedUserDpl] = await prisma.$transaction([
+      prisma.user.create({
+        data: {
+          name: requestBody.name,
+          email: requestBody.email,
+          nip: requestBody.nip,
+          password: hashedPassword,
+          user_role: {
+            create: {
+              role_id: role.id,
+            },
+          },
+        },
+      }),
+    ]);
+
+    return toRegisterDplUserResponse(storedUserDpl);
   }
 }

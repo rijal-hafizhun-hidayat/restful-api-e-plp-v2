@@ -42,7 +42,7 @@ model prodi {
 
 model role {
   id         Int         @id @default(autoincrement())
-  name       String      @db.VarChar()
+  name       String      @unique @db.VarChar()
   created_at DateTime    @default(now())
   updated_at DateTime    @updatedAt
   user_role  user_role[]

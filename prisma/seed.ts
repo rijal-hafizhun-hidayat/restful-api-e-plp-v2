@@ -8,11 +8,14 @@ async function main() {
         name: "admin",
       },
       {
-        name: "mahasiswa",
+        name: "student",
       },
       {
-        name: 'dpl'
-      }
+        name: "dpl",
+      },
+      {
+        name: "teacher",
+      },
     ],
   });
 

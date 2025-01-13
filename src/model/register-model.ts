@@ -1,13 +1,13 @@
 import type { user } from "@prisma/client";
 
-export interface RegisterRequest {
+export interface RegisterStudentRequest {
   name: string;
   email: string;
   password: string;
   nim: number;
 }
 
-export interface RegisterResponse {
+export interface RegisterStudentResponse {
   id: number;
   name: string;
   email: string;
@@ -16,7 +16,9 @@ export interface RegisterResponse {
   updated_at: Date;
 }
 
-export function toRegisterUserResponse(user: user): RegisterResponse {
+export function toRegisterStudentUserResponse(
+  user: user
+): RegisterStudentResponse {
   return {
     id: user.id,
     name: user.name,

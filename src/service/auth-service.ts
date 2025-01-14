@@ -1,6 +1,7 @@
 import { prisma } from "../app/database";
 import { ErrorResponse } from "../error/error-response";
 import { toLoginResponse, type LoginRequest } from "../model/auth-model";
+import { BlacklistUtil } from "../utils/blacklist-util";
 import { TokenUtil } from "../utils/token-util";
 import { AuthValidation } from "../validation/auth-validation";
 import { Validation } from "../validation/validation";
@@ -34,5 +35,15 @@ export class AuthService {
     const token: string = await TokenUtil.generateToken(user);
 
     return toLoginResponse(token);
+  }
+
+  static async logout(tokenHeader: string) {
+    const [, token] = tokenHeader.split(" ");
+
+    if (BlacklistUtil.hasTokenBlacklist(token)) {
+      throw new ErrorResponse(404, "token has been blacklisted");
+    }
+
+    BlacklistUtil.addTokenBlacklist(token);
   }
 }

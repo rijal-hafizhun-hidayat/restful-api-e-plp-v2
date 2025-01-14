@@ -18,8 +18,9 @@ model user {
   name              String          @db.VarChar()
   email             String          @unique @db.VarChar()
   email_verified_at DateTime?       @db.Timestamp()
-  nim               Int?            @db.Integer
-  nip               Int?            @db.Integer
+  nim               Int?            @unique @db.Integer
+  nip               Int?            @unique @db.Integer
+  password          String          @db.VarChar()
   created_at        DateTime        @default(now())
   updated_at        DateTime        @updatedAt
   user_prodi        user_prodi?
@@ -41,7 +42,7 @@ model prodi {
 
 model role {
   id         Int         @id @default(autoincrement())
-  name       String      @db.VarChar()
+  name       String      @unique @db.VarChar()
   created_at DateTime    @default(now())
   updated_at DateTime    @updatedAt
   user_role  user_role[]

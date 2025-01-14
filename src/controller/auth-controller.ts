@@ -20,4 +20,22 @@ export class AuthController {
       next(error);
     }
   }
+
+  static async logout(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> {
+    try {
+      const tokenHeader = req.headers.authorization as string;
+      const result = await AuthService.logout(tokenHeader);
+      return res.status(200).json({
+        statusCode: 200,
+        message: "logout success",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

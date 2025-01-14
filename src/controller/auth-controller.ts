@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import type { LoginRequest } from "../model/auth-model";
+import type { CurrentUser, LoginRequest } from "../model/auth-model";
 import { AuthService } from "../service/auth-service";
+import type { CostumeRequest } from "../interface/request-interface";
 
 export class AuthController {
   static async login(
@@ -31,7 +32,25 @@ export class AuthController {
       const result = await AuthService.logout(tokenHeader);
       return res.status(200).json({
         statusCode: 200,
-        message: "logout success",
+        message: "success logout",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getCurrentUser(
+    req: CostumeRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> {
+    try {
+      const auth: CurrentUser = req.currentUser as CurrentUser;
+      const result = await AuthService.getCurrentUser(auth);
+      return res.status(200).json({
+        statusCode: 200,
+        message: "success get current user",
         data: result,
       });
     } catch (error) {

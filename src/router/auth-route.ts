@@ -6,4 +6,5 @@ const authRoute = express.Router();
 
 authRoute.use(authMiddleware);
 authRoute.post("/api/logout", AuthController.logout);
+authRoute.get("/api/current-user", AuthController.getCurrentUser);
 export { authRoute };
